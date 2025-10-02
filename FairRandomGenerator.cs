@@ -12,7 +12,7 @@ class FairRandomGenerator
     {
         key = new byte[32];
         RandomNumberGenerator.Fill(key);
-        mortyValue = RandomInt(range);
+        mortyValue = RandomNumberGenerator.GetInt32(range);
         byte[] mvBytes = mortyValue.ToByteArray();
         var h = hmacHelper.HmacSha3_256(key, mvBytes);
         currentHmacHex = ToHex(h);
@@ -23,21 +23,6 @@ class FairRandomGenerator
     {
         var final = (mortyValue + r) % range;
         return (mortyValue, final);
-    }
-
-    private BigInteger RandomInt(int range)
-    {
-        if (range <= 0) return 0;
-        int bits = (int)Math.Ceiling(BigInteger.Log(range, 2));
-        int bytes = Math.Max(1, (bits + 7) / 8);
-        while (true)
-        {
-            byte[] b = new byte[bytes];
-            RandomNumberGenerator.Fill(b);
-            var val = new BigInteger(b.Concat(new byte[] { 0 }).ToArray());
-            if (val < 0) val = BigInteger.Abs(val);
-            if (val < range) return val;
-        }
     }
 
     public string RevealKeyHex()
