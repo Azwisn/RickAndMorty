@@ -28,22 +28,25 @@
     private void PlayRound()
     {
         morty.PrepareHide(n, generator);
+
         int rickValue = AskInt($"Morty: Rick, enter your number [0,{n}) so you don’t whine later that I cheated, alright?");
-        Console.WriteLine("Morty: Okay, okay, I hid the gun. What’s your guess [0," + n + ")?");
+        Console.WriteLine($"Morty: Okay, okay, I hid the gun. What’s your guess [0,{n})?");
         int rickGuess = AskInt("Your guess:");
+
+        int other = PickOtherBox(rickGuess);
+        Console.WriteLine($"Morty: I'm keeping box {rickGuess} and box {other}.");
+        bool switched = AskSwitch(rickGuess, other);
+        int finalChoice = switched ? other : rickGuess;
+
         var (hiddenBox, msgs) = morty.RevealStep(n, generator, rickValue);
         foreach (var m in msgs) Console.WriteLine(m);
         Console.WriteLine($"Morty: The portal gun is in the box {hiddenBox}.");
-        bool rickWon = (rickGuess == hiddenBox);
-        bool switched = AskSwitch();
-        if (switched)
-        {
-            int other = PickOtherBox(rickGuess, hiddenBox);
-            rickWon = (other == hiddenBox);
-        }
+
+        bool rickWon = (finalChoice == hiddenBox);
         Console.WriteLine(rickWon ? "Morty: Aww man, you won, Rick." : "Morty: Aww man, you lost, Rick.");
         stats.AddRound(switched, rickWon);
     }
+
 
     private int AskInt(string prompt)
     {
@@ -56,23 +59,27 @@
         }
     }
 
-    private bool AskSwitch()
+    private bool AskSwitch(int rickGuess, int other)
     {
-        Console.WriteLine("Morty: You can switch your box (enter 0), or stick with it (enter 1).");
+        Console.WriteLine($"Morty: You can switch your box (enter {other}), or stick with it (enter {rickGuess}).");
         while (true)
         {
             var s = Console.ReadLine();
-            if (s == "0") return true;
-            if (s == "1") return false;
-            Console.WriteLine("Enter 0 to switch, 1 to stay.");
+            if (int.TryParse(s, out int v))
+            {
+                if (v == other) return true;
+                if (v == rickGuess) return false;
+            }
+            Console.WriteLine($"Enter {other} to switch, {rickGuess} to stay.");
         }
     }
 
-    private int PickOtherBox(int rickPick, int hidden)
+
+    private int PickOtherBox(int rickPick)
     {
         for (int i = 0; i < n; i++)
         {
-            if (i != rickPick && i != hidden) return i;
+            if (i != rickPick) return i;
         }
         return rickPick;
     }

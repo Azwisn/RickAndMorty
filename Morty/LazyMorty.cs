@@ -12,11 +12,13 @@
     public (int chosenBox, string[] messages) RevealStep(int n, FairRandomGenerator generator, int rickPick)
     {
         var (mortyVal, final) = generator.RevealAfterRick(rickPick, n);
-        Console.WriteLine($"Morty: Aww man, my 1st random value is {mortyVal}.");
-        Console.WriteLine($"Morty: KEY1={generator.RevealKeyHex()}");
-        hiddenBox = (int)final;
-        var msgs = new string[] { $"Morty: So the 1st fair number is ({rickPick} + {mortyVal}) % {n} = {final}" };
-        return (hiddenBox, msgs);
+        var msgs = new string[]
+        {
+            $"Morty: Aww man, my 1st random value is {mortyVal}.",
+            $"Morty: KEY1={generator.RevealKeyHex()}",
+            $"Morty: So the 1st fair number is ({rickPick} + {mortyVal}) % {n} = {final}"
+        };
+        return ((int)final, msgs);
     }
 
     public (double pSwitch, double pStay) CalculateProbability(int n)
