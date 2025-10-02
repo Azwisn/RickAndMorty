@@ -1,6 +1,5 @@
 ﻿class LazyMorty : IMorty
 {
-    private int hiddenBox = 0;
     public string Name => "LazyMorty";
 
     public void PrepareHide(int n, FairRandomGenerator generator)
